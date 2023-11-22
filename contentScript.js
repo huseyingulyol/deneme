@@ -6,13 +6,10 @@ const skipAd = async () => {
 
 
 const endAnimaiton = async (popupForm,event)=> {
-  // console.log(`${event.animationName} animation ended.`);
   if (event.animationName == "slide")
   {
     popupForm.remove();
   }
-  
-  
 }
 
 function sleep(ms) {
