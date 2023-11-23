@@ -1,7 +1,9 @@
+
+var lastVideoSrc = "";
+
 const skipAd = async () => {
   let skipBtn = document.querySelector('.ytp-ad-skip-button-modern.ytp-button');
   skipBtn.click();
-  console.log("Reklam geçilmesi istendi.");
 };
 
 
@@ -16,63 +18,112 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function createPopup()
+async function getIntegerTime()
+{
+  return parseInt((document.querySelector('.ytp-time-current').textContent).replace(':',''));
+}
+
+
+async function createPopup()
 {
   const popupPage = document.createElement("div");
     popupPage.className = "popup-container-sw";
     popupPage.innerHTML = `
-    <div class="text" id="mainText">Ad skipped!</div>
-    <div class="text" id="check">✓</div>
+    <div class="text-sw">Ad skipped!</div>
+    <div class="check-sw">✓</div>
     `;
     document.body.appendChild(popupPage);
 
     popupPage.addEventListener("animationend", (event) =>  endAnimaiton(popupPage,event));    
 }
 
-async function ytmodule()
-{
-  let ytm = document.querySelector('.ytp-chrome-bottom');
 
-  while (ytm == null)
+async function IsNullTryUntilSeconds(sec,className)
+{
+  let countMs= 0;
+  let waitMs = 100;
+  let module = document.querySelector(className);
+  while (module == null  && countMs < (sec * 1000))
   {
-    console.log("Module bekleniyor...");
-    await sleep(200);
-    ytm = document.querySelector('.ytp-chrome-bottom');
+    console.log(`'${className}' bulunamadı!`);
+    await sleep(waitMs);
+    countMs += waitMs;
+    module = document.querySelector(className);
   }
+
+  if (module == null) return true;
+  else return false;
 
 }
 
-const killAd = async () => {
+async function IsElementNull(className)
+{
 
-    await ytmodule();
+  let module = document.querySelector(className);
+  if (module == null)
+  {
+    return true;
+  }
+  else return false;
 
-    let module = document.querySelector('.video-ads.ytp-ad-module');
-    if (module == null)
-    {
-      console.log("Reklam çıkmadı! (Modul bulunamadı.)");
-      return;
-    }
+}
 
-    let adElementCount = document.querySelector('.video-ads.ytp-ad-module').childElementCount;
 
-    if (adElementCount == 0)
-    {
-      console.log(adElementCount);
-      console.log("Reklam çıkmadı! (Modül bulundu.)");
-      return;
-    }
+async function waitFuncUntilSeconds(sec,func)
+{
+  let countMs= 0;
+  let waitMs = 100;
 
-    while (adElementCount == 1)
-    {
-      console.log("Reklam farkedildi.");
-      await skipAd();
-      await sleep(200);
-      adElementCount = document.querySelector('.video-ads.ytp-ad-module').childElementCount;
-    }
+  let result = await func();
+  while (countMs < (sec * 1000) && result == false)
+  {
+    result = await func();
+    await sleep(waitMs);
+    countMs += waitMs;
+  }
 
-    console.log("Reklam geçme başarılı!");
-    createPopup();
+  
+  if (result) return true;
+  else return false;
+
+}
+
+
+async function IsVideoChanged()
+{
+
+  let videoPanel =  document.querySelector('.video-stream.html5-main-video') ;
+  if (videoPanel != null)  newVideoSrc = videoPanel.src.toString();
+
+  if (lastVideoSrc != newVideoSrc && newVideoSrc != '')
+  {
+    lastVideoSrc = newVideoSrc;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+async function killAd()  {
+
+  if (!(await waitFuncUntilSeconds(5,IsVideoChanged)))
+  {
+    return;
+  }
+
+  if (await IsNullTryUntilSeconds(1,".ytp-ad-skip-button-modern.ytp-button"))
+  {
+    return;
+  }
+
+  await skipAd();
+  await createPopup();
 };
+
+
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'TabUpdated') {

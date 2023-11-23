@@ -38,24 +38,26 @@ body{
   animation: slide 2.5s 1 ease forwards,tilt-shaking 3s infinite;
 }
 
-.text{
+.text-sw{
   color: white;
-  -webkit-animation: tilt-shaking 3s infinite,tilt-shaking 3s infinite;
-  -moz-animation: tilt-shaking 3s infinite,tilt-shaking 3s infinite;
-  animation: tilt-shaking 3s infinite,tilt-shaking 3s infinite;
+  
+  -webkit-animation: tilt-shaking 3s infinite;
+  -moz-animation: tilt-shaking 3s infinite;
+  animation: tilt-shaking 3s infinite;
 
 }
 
-#check{
-  
-  -webkit-text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.801); 
-  -moz-text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.801); 
-  text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.801); 
+.check-sw{
 
   position: absolute;
   font-size: 8vh;
   right: 10px;
   color: white;
+
+  -webkit-text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.801); 
+  -moz-text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.801); 
+  text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.801); 
+
 
   -webkit-animation: shrinking 2s 1 ease forwards,tilt-shaking 1s infinite;
   -moz-animation: shrinking 2s 1 ease forwards,tilt-shaking 1s infinite;
