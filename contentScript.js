@@ -50,7 +50,6 @@ async function IsNullTryUntilSeconds(sec,className)
   let module = document.querySelector(className);
   while (module == null  && countMs < (sec * 1000))
   {
-    console.log(`'${className}' bulunamadı!`);
     await sleep(waitMs);
     countMs += waitMs;
     module = document.querySelector(className);
@@ -120,7 +119,7 @@ async function killAd()  {
     return;
   }
 
-  if (await IsNullTryUntilSeconds(2,btnClassName))
+  if (await IsNullTryUntilSeconds(3,btnClassName))
   {
     console.log(`'${btnClassName}' not found!`);
     return;
@@ -129,7 +128,7 @@ async function killAd()  {
   await skipAd();
   await createPopup();
   console.log(`ad skipped!`);
-  
+
 };
 
 
