@@ -96,6 +96,7 @@ async function waitFuncUntilSeconds(sec,func)
 async function IsVideoChanged()
 {
 
+  let newVideoSrc = '';
   let videoPanel =  document.querySelector('.video-stream.html5-main-video') ;
   if (videoPanel != null)  newVideoSrc = videoPanel.src.toString();
 
