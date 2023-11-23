@@ -1,5 +1,7 @@
 
 var lastVideoSrc = "";
+var btnClassName = ".ytp-ad-skip-button-modern.ytp-button";
+
 
 const skipAd = async () => {
   let skipBtn = document.querySelector('.ytp-ad-skip-button-modern.ytp-button');
@@ -14,9 +16,11 @@ const endAnimaiton = async (popupForm,event)=> {
   }
 }
 
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 
 async function getIntegerTime()
 {
@@ -40,6 +44,7 @@ async function createPopup()
 
 async function IsNullTryUntilSeconds(sec,className)
 {
+
   let countMs= 0;
   let waitMs = 100;
   let module = document.querySelector(className);
@@ -111,22 +116,27 @@ async function killAd()  {
 
   if (!(await waitFuncUntilSeconds(5,IsVideoChanged)))
   {
+    console.log(`'${'video_stream'}' not found!`);
     return;
   }
 
-  if (await IsNullTryUntilSeconds(1,".ytp-ad-skip-button-modern.ytp-button"))
+  if (await IsNullTryUntilSeconds(2,btnClassName))
   {
+    console.log(`'${btnClassName}' not found!`);
     return;
   }
-
+  
   await skipAd();
   await createPopup();
+  console.log(`ad skipped!`);
+  
 };
 
 
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'TabUpdated') {
+    console.log("swytadb injected");
     killAd();
   }
 })
