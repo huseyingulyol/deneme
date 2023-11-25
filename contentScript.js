@@ -9,22 +9,9 @@ const skipAd = async () => {
 };
 
 
-const endAnimaiton = async (popupForm,event)=> {
-  if (event.animationName == "slide")
-  {
-    popupForm.remove();
-  }
-}
-
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-async function getIntegerTime()
-{
-  return parseInt((document.querySelector('.ytp-time-current').textContent).replace(':',''));
 }
 
 
@@ -41,24 +28,13 @@ async function createPopup()
     popupPage.addEventListener("animationend", (event) =>  endAnimaiton(popupPage,event));    
 }
 
-
-async function IsNullTryUntilSeconds(sec,className)
-{
-
-  let countMs= 0;
-  let waitMs = 100;
-  let module = document.querySelector(className);
-  while (module == null  && countMs < (sec * 1000))
+const endAnimaiton = async (popupForm,event)=> {
+  if (event.animationName == "slide")
   {
-    await sleep(waitMs);
-    countMs += waitMs;
-    module = document.querySelector(className);
+    popupForm.remove();
   }
-
-  if (module == null) return true;
-  else return false;
-
 }
+
 
 async function IsElementNull(className)
 {
@@ -73,64 +49,54 @@ async function IsElementNull(className)
 }
 
 
-async function waitFuncUntilSeconds(sec,func)
+var token = true;
+
+async function Start()
 {
-  let countMs= 0;
-  let waitMs = 100;
+  token = true;
+  console.log("Started!");
+  await Process();
+  console.log("Stopped!");
 
-  let result = await func();
-  while (countMs < (sec * 1000) && result == false)
-  {
-    result = await func();
-    await sleep(waitMs);
-    countMs += waitMs;
-  }
+}
 
-  
-  if (result) return true;
-  else return false;
+async function Cancel()
+{
+  token = false;
+  console.log("Cancelling...");
 
 }
 
 
-async function IsVideoChanged()
+async function Process()
 {
+  let step = 0;
 
-  let newVideoSrc = '';
-  let videoPanel =  document.querySelector('.video-stream.html5-main-video') ;
-  if (videoPanel != null)  newVideoSrc = videoPanel.src.toString();
-
-  if (lastVideoSrc != newVideoSrc && newVideoSrc != '')
+  while (token)
   {
-    lastVideoSrc = newVideoSrc;
-    return true;
+
+    if (!(await IsElementNull(btnClassName)))
+    {
+      await skipAd();
+      await createPopup();
+      console.log(`Ad skipped! (${step})`);
+      step = 0;
+    }
+    else
+    {
+      // console.log(`Skip button not found. (${step++})`);
+    }
+
+    await sleep(100);
   }
-  else
+
+
+  while ((await IsElementNull(btnClassName)) && token)
   {
-    return false;
+    
+    await sleep(50);
   }
 }
-
-
-async function killAd()  {
-
-  if (!(await waitFuncUntilSeconds(5,IsVideoChanged)))
-  {
-    console.log(`'${'video_stream'}' not found!`);
-    return;
-  }
-
-  if (await IsNullTryUntilSeconds(3,btnClassName))
-  {
-    console.log(`'${btnClassName}' not found!`);
-    return;
-  }
-  
-  await skipAd();
-  await createPopup();
-  console.log(`ad skipped!`);
-
-};
 
 
 
@@ -138,5 +104,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'TabUpdated') {
     console.log("swytadb injected");
     killAd();
+  }
+  else if (request.message === 'StartProcess') {
+
+    Start();
+  }
+  else if (request.message === 'StopProcess') {
+
+    Cancel();
   }
 })
